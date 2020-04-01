@@ -5,19 +5,81 @@
  */
 package pmfinal;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author JohnV
  */
 public class PMFinal extends javax.swing.JFrame {
-
+FileSystem fs;
+    Path pathToFile;
+    InputStream cardIn = null;
+    BufferedReader cardReader;
+    ArrayList<Cards> cardList=new ArrayList<Cards>();
+    int index=0;
     /**
      * Creates new form PMFinal
      */
     public PMFinal() {
         initComponents();
+        fs=FileSystems.getDefault();
+        pathToFile=fs.getPath("c:\\data\\Flashcards.csv");
+        
+        Cards aFlashCard;
+        String line="";
+        try {
+            cardIn=Files.newInputStream(pathToFile);
+            cardReader = new BufferedReader(new InputStreamReader(cardIn));
+            // read the file one line at a time
+            
+            while((line=cardReader.readLine())!=null){
+                String records[]=line.split(",");
+                aFlashCard = new Cards();
+                
+                try {
+                    aFlashCard.setId(Integer.parseInt(records[0]));
+                    aFlashCard.setWord(records[1]);
+                    aFlashCard.setDef(records[2]);
+                    
+                    
+                    cardList.add(aFlashCard);
+                    
+                } catch (NumberFormatException numberFormatException) {
+                    // ignore lines with int id errors
+                }//end of inner try
+                
+            }//end of while
+             //verification records were read - line below:
+          //  JOptionPane.showMessageDialog(this,"Records read "+contactList.size());
+            
+            cardIn.close();
+                    } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,"Cannot opt company/n"+ex.getMessage());
+            System.exit(15);
+        }
+        showRecord();
     }
+        
+        
+  
 
+    public void showRecord(){
+        this.CardText.setText(cardList.get(index).getWord());
+        
+        
+        this.setTitle("Records #"+index+"of" + cardList.size());
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -29,16 +91,21 @@ public class PMFinal extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        CardText = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        CardText.setColumns(20);
+        CardText.setRows(5);
+        CardText.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CardTextMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(CardText);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -50,10 +117,10 @@ public class PMFinal extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -61,8 +128,8 @@ public class PMFinal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -70,20 +137,24 @@ public class PMFinal extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(73, 73, 73)
+                .addGap(27, 27, 27)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(58, 58, 58)
+                .addGap(64, 64, 64)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(104, Short.MAX_VALUE))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void CardTextMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CardTextMouseClicked
+       this.CardText.setText(cardList.get(index).getDef());
+    }//GEN-LAST:event_CardTextMouseClicked
 
     /**
      * @param args the command line arguments
@@ -121,9 +192,9 @@ public class PMFinal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea CardText;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 }
