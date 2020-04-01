@@ -1,0 +1,4 @@
+1,menu bar,horizontal strip that is placed at the top of a container and that contains user options
+2,alpha value,of a color indicates the level of transparency
+3,content pane,contains all the visible components in a top-level containers's user interface
+4,panel,a plain boderless surface that can hold other GUI components
